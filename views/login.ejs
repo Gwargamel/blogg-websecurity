@@ -1,0 +1,16 @@
+<%- include('header') %>
+
+<main>
+  <h1>Logga in</h1>
+  <form action="/login" method="POST">
+    <label for="username">Användarnamn:</label>
+    <input type="text" id="username" name="username" required />
+
+    <label for="password">Lösenord:</label>
+    <input type="password" id="password" name="password" required />
+
+    <button type="submit">Logga in</button>
+  </form>
+</main>
+
+<%- include('footer') %>

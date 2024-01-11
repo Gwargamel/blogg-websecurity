@@ -1,0 +1,18 @@
+<%- include('header') %>
+
+<main>
+  <!-- Formulär för att skapa en ny användare med fält för att ange användarnamn och lösenord -->
+  <h1>Registrera ny användare</h1>
+  <form action="/register" method="POST">
+    <label for="username">Användarnamn:</label>
+    <input type="text" id="username" name="username" required />
+
+    <label for="password">Lösenord:</label>
+    <input type="password" id="password" name="password" required />
+
+    <!-- Knapp för att spara de nya användaruppgifterna -->
+    <button type="submit">Registrera</button>
+  </form>
+</main>
+
+<%- include('footer') %>

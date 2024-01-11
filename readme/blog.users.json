@@ -1,0 +1,24 @@
+[{
+  "_id": {
+    "$oid": "659e73218d2578180a4a3081"
+  },
+  "username": "Nalle",
+  "password": "$2b$10$Vcq6b2Am/6rWaxzqoOWlYOQIe6fVv2/0bl1BD1Kf1SWoa1HOmtRpi",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "659ebbbe4fb391472c4ed443"
+  },
+  "username": "Gymbrosunited",
+  "password": "$2b$10$oq231Mr3TV5BIGoc8V8AJeAPSCmGwL2p41erTwu9hX8BAuCZTbOxu",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "659ec3a2088875e20536e2b3"
+  },
+  "username": "Blondinbella",
+  "password": "$2b$10$freX37LSwudCVlkqlhiJ2uX8Xi8oT8J4Nc1Y4WSysCHdqsad4scqe",
+  "__v": 0
+}]

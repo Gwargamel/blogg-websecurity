@@ -1,0 +1,67 @@
+<%- include('header') %>
+
+<main>
+  <!-- En hälsningsfras samt användarens namn -->
+  <h1>Välkommen <%= user ? user.username : '' %></h1>
+  <hr />
+
+  <!-- När användaren är inloggad visas länkar för att skapa nya inlägg samt en knapp för att logga ut -->
+  <p><% if (user) { %></p>
+
+  <!-- Information placerad i det övre högra hörnet med namn på den användare som är inloggad -->
+  <p style="position: absolute; top: 0; right: 0">
+    Inloggad som: <%= user.username %>
+  </p>
+
+  <p>
+    <a href="/create-post">Skapa ett nytt inlägg</a> |
+    <a href="/logout">Logga ut</a>
+  </p>
+
+  <!-- Om användaren inte är inloggad visas en knapp för att logga in samt en knapp för att registrera ny användare-->
+  <% } else { %>
+  <p>
+    <a href="/login">Logga in</a> |
+    <a href="/register">Registrera</a>
+  </p>
+  <p>Du måste logga in för att kunna skapa nya inlägg.</p>
+  <% } %>
+  <hr />
+
+  <h2>Blogginlägg</h2>
+  <!-- En lista över alla inlägg med titel, innehåll, användarnamn och datum/tid -->
+  <% if (posts && posts.length > 0) { %>
+  <ul>
+    <% posts.forEach(post => { %>
+    <li>
+      <h3><%= post.title %></h3>
+      <p><%= post.content %></p>
+      <hr />
+      <p>
+        Skapad av: <%= post.signature ? post.signature : 'Ingen signatur \
+        tillgänglig' %>
+      </p>
+
+      <p>Skapad: <%= post.createdAt.toLocaleString() %></p>
+
+      <!-- Knapp för att radera inlägg syns bara om användaren är inloggad -->
+      <% if (user && user._id.equals(post.author)) { %>
+      <form
+        action="/delete-post/<%= post._id %>?_method=DELETE"
+        method="POST"
+        onsubmit="return confirm('Är du säker på att du vill radera detta inlägg?')"
+      >
+        <button type="submit">Radera inlägg</button>
+      </form>
+
+      <% } %>
+    </li>
+    <% }); %>
+  </ul>
+  <% } else { %>
+  <!-- Om inga inlägg finns, visas detta meddelande -->
+  <p>Inga inlägg hittades.</p>
+  <% } %>
+</main>
+
+<%- include('footer') %>
