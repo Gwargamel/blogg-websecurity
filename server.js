@@ -58,7 +58,7 @@ const requireLogin = (req, res, next) => {
   }
 };
 
-//Anger vy-motorn---
+//Anger vy-motorn
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
