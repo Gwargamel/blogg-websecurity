@@ -1,4 +1,5 @@
 // Importering av moduler
+const helmet = require("helmet");
 const express = require("express");
 const mongoose = require("mongoose");
 const session = require("express-session");
@@ -37,10 +38,15 @@ const User = mongoose.model("User", {
 });
 
 // Middleware-inställningar
+app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method")); // Använd method-override
 app.use(
-  session({ secret: "your-secret-key", resave: true, saveUninitialized: true })
+  session({
+    secret: "your-secret-key",
+    resave: true,
+    saveUninitialized: true,
+  })
 );
 
 //Kontrollerar att användaren är inloggad
