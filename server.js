@@ -1,22 +1,22 @@
 // Importering av moduler
-const helmet = require("helmet");
-const express = require("express");
-const mongoose = require("mongoose");
-const session = require("express-session");
-const bcrypt = require("bcrypt");
-const methodOverride = require("method-override");
+const helmet = require("helmet"); // Ökar säkerheten med hjälp av HTTP-headers
+const express = require("express"); // Ramverk för att skapa webbapplikationer med Node.js
+const mongoose = require("mongoose"); // ODM (Object Data Modeling) för att arbeta med databaser i MongoDB
+const session = require("express-session"); // Middleware för sessionshantering i Express
+const bcrypt = require("bcrypt"); // Hashar lösenord
+const methodOverride = require("method-override"); // Middleware för PUT och DELETE
 
 // Skapande av express app
 const app = express();
 const port = 3000;
 
-// Koppla upp till servern mongoDB
+// Kopplar upp till servern mongoDB
 mongoose.connect("mongodb://localhost/blog", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-// Definiera mongoose modeller
+// Definierar mongoose modeller för databasens struktur
 const Post = mongoose.model("Post", {
   title: String,
   content: String,
@@ -38,9 +38,9 @@ const User = mongoose.model("User", {
 });
 
 // Middleware-inställningar
-app.use(helmet());
-app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method")); // Använd method-override
+app.use(helmet()); // Används för att ställa in olika HTTP-headers för ökad säkerhet
+app.use(express.urlencoded({ extended: true })); // Tolkar url-kodad data i POST-förfrågningar
+app.use(methodOverride("_method")); // Använder HTTP-metoder som PUT och DELETE
 app.use(
   session({
     secret: "your-secret-key",
