@@ -46,6 +46,7 @@ app.use(
     secret: "your-secret-key",
     resave: true,
     saveUninitialized: true,
+    cookie: { expires: (maxAge = 1000 * 60 * 60) },
   })
 );
 
