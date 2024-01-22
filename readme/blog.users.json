@@ -21,4 +21,20 @@
   "username": "Blondinbella",
   "password": "$2b$10$freX37LSwudCVlkqlhiJ2uX8Xi8oT8J4Nc1Y4WSysCHdqsad4scqe",
   "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65a536d80a9099354b02029e"
+  },
+  "username": "Kackel",
+  "password": "$2b$10$ozpVwB/v0fFK.8200FuBwO0wwS..85NfaV9/HZP.jI3bS9tsaKEFu",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65a536f90a9099354b0202a1"
+  },
+  "username": "Adam",
+  "password": "$2b$10$g0OlSuc/qPTDrWTIxHc53ubCPiquWZ0mBYECfIHxtxtfvmHVzaZGS",
+  "__v": 0
 }]

@@ -42,4 +42,19 @@
     "$date": "2024-01-10T16:20:15.625Z"
   },
   "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65a2cc3140a8132dd93e4a46"
+  },
+  "title": "The Dead Boys: A Legendary Journey in Rock and Roll",
+  "content": "Long Live the Dead Boys\r\nThe Dead Boys – often labeled as the punkiest of the punk bands from the early punk scene at CBGBs – have certainly left a legacy that is as disgusting as it is worthwhile. From sex acts on stage to stabbings, and everything in between, their story is one that you can’t forget and a story of punk that we can be proud of, I think. Anywho, here’s the story of the Dead Boys.\r\n\r\nFORMATION OF THE BAND: A PUNK ROCK REVOLUTION\r\nThe Dead Boys were a group of fearless musicians who set out to challenge the norms of the world and music industry. In 3 years, with their wild and unpredictable stage presence, they quickly gained a reputation as one of punk rock’s most notorious acts. The band included Jimmy Zero at rhythm guitar, Jeff Magnum for bass, drummer Johnny Blitz, THE Cheetah Chrome playing lead guitar, and all led by Stiv Bators at vocals.\r\n\r\nBefore all that, they were a band called Frankenstein and met in Cleveland, Ohio. It wouldn’t be until they relocated to New York City in 1976 that they started calling themselves the Dead Boys. This move was done by the influence of Joey Ramone who helped get them a gig at CBGBs. By 1977, they would release their debut – Young, Loud, and Snotty which included the song “Song Reducer.” The debut has been declared one of the finest albums in punk history and you can give it a go with the playlist below. We Have Come for Your Children, their second album, would drop in 1978. In true punk fashion, they broke up in 1979 due to pressure from their label, Sire Records, to change their sound and look.",
+  "author": {
+    "$oid": "659e73218d2578180a4a3081"
+  },
+  "signature": "Nalle",
+  "createdAt": {
+    "$date": "2024-01-13T17:45:21.314Z"
+  },
+  "__v": 0
 }]
