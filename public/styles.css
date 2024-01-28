@@ -1,4 +1,3 @@
-/* Reset CSS to remove default styles */
 body,
 h1,
 h2,
@@ -6,6 +5,7 @@ h3,
 p,
 ul,
 li {
+  /* Avlägsnar standardmarginaler i listor*/
   margin: 0;
   padding: 0;
 }
