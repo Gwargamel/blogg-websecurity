@@ -116,43 +116,46 @@ app.get("/logout", (req, res) => {
   });
 });
 
+//En expressrutt hanterar GET-förfrågningar till rot-URL
 app.get("/", async (req, res) => {
   try {
-    let user; // Deklarera variabeln 'user'
+    let user; //Variabeln 'user'
 
-    // Kontrollerar om det finns ett 'userId' i sessionen
+    //En if-else-sats kontrollerar om det finns ett userId i sessionen
     if (req.session.userId) {
-      // Om 'userId' finns, hämta användaren från databasen
+      //Om userId finns, hämtas användaren från databasen
       user = await User.findById(req.session.userId).exec();
     } else {
-      // Om det inte finns något 'userId', sätt 'user' till null
+      //Om userId ej finns sätts user till null
       user = null;
     }
 
-    // Hämta alla blogginlägg, sorterade efter skapelsedatum i fallande ordning
+    // Hämtar alla blogginlägg, sorterade efter datum
     const posts = await Post.find().sort({ createdAt: "desc" }).exec();
 
-    // Rendera sidan med användar- och inläggsdata
+    // Renderar en sida med användar- och inläggsdata
     res.render("index", { user: user, posts: posts });
   } catch (error) {
-    // Hantera eventuella fel
-    console.error(error);
-    res.redirect("/");
+    //Catch fångar upp eventuella fel
+    console.error(error); //Felmeddelande loggas i konsollen
+    res.redirect("/"); //Omdirigerar användaren tillbaka till startsidan
   }
 });
 
 // /create-post-rutten renderar en vy där användaren kan skapa ett blogginlägg
 app.get("/create-post", requireLogin, async (req, res) => {
-  //Funktionen använder try-catch för att fånga upp eventuella fel
+  //Asyncron-funktion som hanterar inkommande GET-förfrågningar
+  //requireLogin kontrollerar att användaren är inloggad vilket krävs för att skriva ett inlägg
   try {
-    const user = req.session.userId
-      ? await User.findById(req.session.userId).exec() //Kontrollerar om det finns ett userId i den aktuella sessionen
+    //Kontrollerar om det finns ett userId i den aktuella sessionen
+    const user = req.session.userId //En ternär operator, ?, används istället för if-else
+      ? await User.findById(req.session.userId).exec() //Hämtar användarens information från databasen
       : null; //Om användaren ej är inloggad sätts userId till null
 
     res.render("create-post", { user: user }); //Skickar en HTML-sida till klienten med datan user
   } catch (error) {
-    //Fångar upp eventuella fel i de asynkrona operationerna
-    console.error(error);
+    //Fångar upp eventuella fel
+    console.error(error); //Felmeddelande loggas i konsollen
     res.redirect("/"); //Omdirigerar användaren tillbaka till startsidan
   }
 });
