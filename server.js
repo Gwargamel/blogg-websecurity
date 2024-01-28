@@ -6,6 +6,7 @@ const mongoose = require("mongoose"); //Behövs för att arbeta med databaser i 
 const session = require("express-session"); // Middleware för sessionshantering i Express
 const bcrypt = require("bcrypt"); //Krypterar användarnas lösenord genom att hasha dem
 const methodOverride = require("method-override"); // Middleware för PUT och DELETE
+const MongoStore = require("connect-mongo"); //Används för att lagra sessionsdata
 
 const app = express(); // Skapar en instans av appen express som använder
 //middleware-funktioner för att behandla förfrågningar via reg och res
@@ -13,6 +14,20 @@ const port = 3000; //Anger porten som appen express ska lyssna på
 
 //Ansluter till databasen (MongoDB) via Mongoose
 mongoose.connect("mongodb://localhost/blog", {});
+
+//Konfigurerar användningen av MongoStore för att spara sessionsdata
+app.use(
+  session({
+    secret: "your-secret-key", //Använder en hemlig nyckel signera session-ID-cookie
+    resave: false, //Sessionen sparas ej tillbaka till session store
+    saveUninitialized: false, //En ny, och ej modifierad, session sparas ej till store
+    store: MongoStore.create({
+      mongoUrl: "mongodb://localhost/blog", //Adress till Mongo-databasen där sessionsdata skall lagras
+      collectionName: "sessions", //Samlingen i MongoDB där sessionsdata sparas
+    }),
+    cookie: { maxAge: 1000 * 60 * 60 }, //Anger livslängden på cookies (1h)
+  })
+);
 
 // Variabel som definierar blogginläggens struktur
 const Post = mongoose.model("Post", {
@@ -29,12 +44,14 @@ const Post = mongoose.model("Post", {
   },
 });
 
-//Variabel som anger att användarnamn, lösenord och signatur anges i sträng-form
-const User = mongoose.model("User", {
+const userSchema = new mongoose.Schema({
   username: String,
   password: String,
   signature: String,
+  isAdmin: { type: Boolean, default: false }, // Ny egenskap för att indikera om användaren är admin
 });
+
+const User = mongoose.model("User", userSchema);
 
 // Middleware-inställningar som ökar säkerheten och hanterar klientförfrågningar samt användarsessioner
 app.use(helmet()); //Använder HTTP-headers för att förhindra t.ex. XSS-attacker, klickjacking etc
@@ -53,7 +70,7 @@ app.use(
 const requireLogin = (req, res, next) => {
   //Arrowfunktion som kontrollerar förfrågan (req) och svaret (res)
   if (!req.session.userId) {
-    //Kontrollerar omu serID finns i användarens session
+    //Kontrollerar om userID finns i användarens session
     res.redirect("/login"); //Omdirigerar användaren till inloggningssidan
   } else {
     next(); //Callbackfunktion som skickar en inloggad användare vidare till nästa middleware i kedjan
@@ -169,7 +186,7 @@ app.get("/create-post", requireLogin, async (req, res) => {
 //Hanterar POST-förfrågan om att skapa nya blogginlägg
 app.post("/create-post", requireLogin, async (req, res) => {
   //skapar en route-hanterare för POST-förfrågningar till /create-post.
-  //requireLogin är enmiddleware-funktion som körs före den asynkronacallback-funktionen och
+  //requireLogin är en middleware-funktion som körs före den asynkrona callback-funktionen och
   //kräver att en användare är inloggad för att kunna publicera ett inlägg
   const { title, content } = req.body;
 
