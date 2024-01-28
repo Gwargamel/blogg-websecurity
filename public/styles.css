@@ -26,7 +26,7 @@ header {
   padding: 1em 0;
 }
 
-/* Main content styling */
+/* Styling av huvudinnehåll */
 main {
   max-width: 800px;
   margin: 20px auto;
@@ -54,7 +54,7 @@ a {
   /* Rosa färg för länkar */
 }
 
-/* Styling för inläggslistan */
+/* Styling för listan med blogginlägg */
 ul {
   list-style: none;
   margin-top: 20px;

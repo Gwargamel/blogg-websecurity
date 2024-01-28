@@ -17,12 +17,10 @@ mongoose.connect("mongodb://localhost:27017/blog", {
 });
 const db = mongoose.connection;
 
-/*Hanterar anslutningsproblem i MongoDB
+//Hanterar anslutningsproblem i MongoDB
 db.on("error", console.error.bind(console, "MongoDB connection error:")); //Skriver ut felmeddelande i konsollen
 db.once("open", () => console.log("Connected to MongoDB")); //Skriver ut meddelande som bekräftar lyckad anslutning i konsollen
-*/
 
-//
 app.use(express.urlencoded({ extended: true })); //Hanterar URL-kodning av formulärdata
 app.use(
   session({ secret: "your-secret-key", resave: true, saveUninitialized: true }) //Konfigurerar sessionen
