@@ -116,20 +116,28 @@ app.get("/logout", (req, res) => {
   });
 });
 
-//Expressrutt som hanterar GET-förfrågningar till rot-URL
 app.get("/", async (req, res) => {
-  //Funktionen använder try-catch för att fånga upp eventuella fel
   try {
-    const user = req.session.userId
-      ? await User.findById(req.session.userId).exec() //Kontrollerar om det finns ett userId i den aktuella sessionen
-      : null; //Om användaren ej är inloggad sätts userId till null
-    const posts = await Post.find().sort({ createdAt: "desc" }).exec(); //Använder Post för att hämta blogginlägg från databasen
+    let user; // Deklarera variabeln 'user'
 
-    res.render("index", { user: user, posts: posts }); //Skickar en HTML-sida till klienten med datan user och posts
+    // Kontrollerar om det finns ett 'userId' i sessionen
+    if (req.session.userId) {
+      // Om 'userId' finns, hämta användaren från databasen
+      user = await User.findById(req.session.userId).exec();
+    } else {
+      // Om det inte finns något 'userId', sätt 'user' till null
+      user = null;
+    }
+
+    // Hämta alla blogginlägg, sorterade efter skapelsedatum i fallande ordning
+    const posts = await Post.find().sort({ createdAt: "desc" }).exec();
+
+    // Rendera sidan med användar- och inläggsdata
+    res.render("index", { user: user, posts: posts });
   } catch (error) {
-    //Fångar upp eventuella fel i de asynkrona operationerna
+    // Hantera eventuella fel
     console.error(error);
-    res.redirect("/"); //Omdirigerar användaren tillbaka till startsidan
+    res.redirect("/");
   }
 });
 
