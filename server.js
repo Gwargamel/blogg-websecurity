@@ -96,15 +96,21 @@ app.get("/login", (req, res) => {
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await User.findOne({ username: username });
-
-  //Bcrypt jämför det angivna lösenordet med det som ligger hashat i databasen
-  if (user && (await bcrypt.compare(password, user.password))) {
-    req.session.userId = user._id;
-    res.redirect("/"); // Om användaren angivit korrekt information omdirigeras de till startsidan
-  } else {
-    res.send("Invalid username or password");
-    //res.redirect("/login"); //Om användaren angivit felaktig information omdirigeras de till inloggningssidan igen
+  try {
+    const user = await User.findOne({ username: username });
+    //Bcrypt jämför det angivna lösenordet med det som ligger hashat i databasen
+    if (user && (await bcrypt.compare(password, user.password))) {
+      req.session.userId = user._id;
+      res.redirect("/"); //Om användaren angivit korrekt information omdirigeras de till startsidan
+    } else {
+      //Om användaren angivit felaktiga inloggningsuppgifter får de ett felmeddelande
+      res
+        .status(401)
+        .send("Du har angivit felaktiga uppgifter. YOU SHALL NOT PASS");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internt serverfel"); //Felmeddelande loggas i konsollen
   }
 });
 
@@ -119,7 +125,7 @@ app.get("/logout", (req, res) => {
 //En expressrutt hanterar GET-förfrågningar till rot-URL
 app.get("/", async (req, res) => {
   try {
-    let user; //Variabeln 'user'
+    let user; //Anger variabeln user
 
     //En if-else-sats kontrollerar om det finns ett userId i sessionen
     if (req.session.userId) {
