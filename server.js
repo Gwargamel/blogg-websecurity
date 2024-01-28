@@ -6,7 +6,7 @@ const session = require("express-session"); // Middleware för sessionshantering
 const bcrypt = require("bcrypt"); // Hashar lösenord
 const methodOverride = require("method-override"); // Middleware för PUT och DELETE
 
-// Skapande av express app
+// Skapar en express app
 const app = express();
 const port = 3000;
 
