@@ -5,19 +5,18 @@ h3,
 p,
 ul,
 li {
-  /* Avlägsnar standardmarginaler i listor*/
+  /* Avlägsnar standardmarginaler i listor */
   margin: 0;
   padding: 0;
 }
 
-body {
+body { /* Anger typsnitt och bakgrundsfärg på sidan */
   font-family: Laila, sans-serif;
   background-color: #f8f8f8;
-  text-align: center;
-  /* Centrera all text på sidan */
+  text-align: center; /* Centrerar all text på sidan */
 }
 
-/* Header styling */
+/* Anger styling av innehåll i header */
 header {
   background-color: #e91e63;
   color: #fff;
@@ -25,7 +24,7 @@ header {
   padding: 1em 0;
 }
 
-/* Styling av huvudinnehåll */
+/* Styling av huvudinnehåll på sidan */
 main {
   max-width: 800px;
   margin: 20px auto;
@@ -35,10 +34,9 @@ main {
   text-align: center;
   border-style: solid;
   border-color: #e91e63;
-  /* Återställ text-align för huvudinnehåll till vänster */
 }
 
-/* Styling för hälsningsfras och länkar */
+/* Anger färgen för rubriker och paragrafer */
 h1,
 h2,
 p,
@@ -46,11 +44,11 @@ a {
   color: #333;
 }
 
+/* Anger styling för länkar */
 a {
   text-decoration: none;
   color: #e91e63;
   font-weight: 600;
-  /* Rosa färg för länkar */
 }
 
 /* Styling för listan med blogginlägg */
@@ -75,7 +73,6 @@ footer {
   text-align: center;
   padding: 1em 0;
   background-color: #e91e63;
-  /* Rosa färg för footer */
   color: #fff;
   position: fixed;
   bottom: 0;
