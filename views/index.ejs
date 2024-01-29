@@ -37,15 +37,11 @@
       <h3><%= post.title %></h3>
       <p><%= post.content %></p>
       <hr />
-      <p>
-        Skapad av: <%= post.signature ? post.signature : 'Ingen signatur \
-        tillgänglig' %>
-      </p>
+      <p>Skapad av: <%= post.signature ? post.signature : 'Anonym' %></p>
+      <p>Skapad: <%= new Date(post.createdAt).toLocaleString() %></p>
 
-      <p>Skapad: <%= post.createdAt.toLocaleString() %></p>
-
-      <!-- Knapp för att radera inlägg syns bara om användaren är inloggad -->
-      <% if (user && user._id.equals(post.author)) { %>
+      <!-- Knapp för att radera inlägg syns om användaren är inloggad och antingen är postens författare eller är administratör -->
+      <% if (user && (user._id.equals(post.author) || user.isAdmin)) { %>
       <form
         action="/delete-post/<%= post._id %>?_method=DELETE"
         method="POST"
@@ -53,13 +49,11 @@
       >
         <button type="submit">Radera inlägg</button>
       </form>
-
       <% } %>
     </li>
     <% }); %>
   </ul>
   <% } else { %>
-  <!-- Om inga inlägg finns, visas detta meddelande -->
   <p>Inga inlägg hittades.</p>
   <% } %>
 </main>
