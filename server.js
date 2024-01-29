@@ -48,10 +48,30 @@ const userSchema = new mongoose.Schema({
   username: String,
   password: String,
   signature: String,
-  isAdmin: { type: Boolean, default: false }, // Ny egenskap för att indikera om användaren är admin
+  isAdmin: { type: Boolean, default: false }, //Fastslår om användaren är admin eller ej
 });
 
 const User = mongoose.model("User", userSchema);
+
+//Kontrollerar om en användare har admin-behörighet
+const isAdmin = (req, res, next) => {
+  if (req.session.userId) {
+    User.findById(req.session.userId, (err, user) => {
+      if (err || !user) {
+        res.status(401).send("App, app, app... Du saknar behörighet");
+      } else if (user.isAdmin) {
+        next(); //Användaren godkänns som administratör
+      } else {
+        res
+          .status(403) //Användare utan behörighet får ett felmeddelande
+          .send("Endast administratörer har tillgång till denna funktion");
+      }
+    });
+  } else {
+    //Användare utan behörighet får ett felmeddelande
+    res.status(401).send("Du måste vara inloggad");
+  }
+};
 
 // Middleware-inställningar som ökar säkerheten och hanterar klientförfrågningar samt användarsessioner
 app.use(helmet()); //Använder HTTP-headers för att förhindra t.ex. XSS-attacker, klickjacking etc
@@ -132,7 +152,7 @@ app.post("/login", async (req, res) => {
 });
 
 // /logout-rutten avslutar sessionen och användaren kan inte återgå till sin inloggade sida
-//genom att t.ex. klicka på bakåtknappen
+//igen genom att t.ex. klicka på bakåtknappen
 app.get("/logout", (req, res) => {
   req.session.destroy(() => {
     res.redirect("/"); //Användaren skickas tillbaka till startsidan
@@ -216,30 +236,14 @@ app.post("/create-post", requireLogin, async (req, res) => {
   }
 });
 
-//Hanterar förfrågningar om att radera blogginlägg
-app.delete("/delete-post/:id", requireLogin, async (req, res) => {
-  //requireLogin säkerställer att endast inloggade användare kan radera blogginlägg
+app.delete("/delete-post/:id", requireLogin, isAdmin, async (req, res) => {
+  //isAdmin undersöker om användaren har admin-behörigheter
   try {
-    //try-catch används för att fånga upp eventuella fel
-    const postId = req.params.id; //hämtar inläggets ID från URL-parametern
-
-    const post = await Post.findOne({
-      _id: postId,
-      author: req.session.userId,
-    }); //Säkerställer att den inloggade användaren är författare till inlägget som skall raderas
-
-    if (!post) {
-      res.status(403).send("Forbidden"); //Om ett fel hittas skickas ett felmeddelande
-      return;
-    }
-
-    await Post.findByIdAndDelete(postId); //Om uppgifterna matchar varandra raderas inlägget från databasen
-
-    res.redirect("/"); //Efter radering omdirigeras användaren tillbaka till startsidan
+    await Post.findByIdAndDelete(req.params.id);
+    res.redirect("/"); //Användaren omdirigeras till startsidan efter att inlägget raderats
   } catch (error) {
-    //Catch hanterar eventuella fel
-    console.error(error); //Ett felmeddelande loggas i konsollen
-    res.status(500).send("Internal Server Error"); //Användaren får ett felmeddelande till svar
+    console.error(error);
+    res.status(500).send("Internt serverfel"); //Om ett fel uppstår loggas ett felmeddelande i konsollen
   }
 });
 
