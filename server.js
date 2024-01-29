@@ -73,6 +73,14 @@ const isAdmin = (req, res, next) => {
   }
 };
 
+/*
+db.users.updateOne(
+  { _id: ObjectId("659e73218d2578180a4a3081") },
+  { $set: { isAdmin: true } }
+);
+
+*/
+
 // Middleware-inställningar som ökar säkerheten och hanterar klientförfrågningar samt användarsessioner
 app.use(helmet()); //Använder HTTP-headers för att förhindra t.ex. XSS-attacker, klickjacking etc
 app.use(express.urlencoded({ extended: true })); //Tolkar url-kodad data i POST-förfrågningar
