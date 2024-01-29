@@ -1,3 +1,5 @@
+OBS: Nalle har adminbehörighet
+
 Inloggningsnamn: Nalle
 Lösenord: 123
 
