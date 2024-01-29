@@ -7,6 +7,28 @@ const session = require("express-session"); // Middleware för sessionshantering
 const bcrypt = require("bcrypt"); //Krypterar användarnas lösenord genom att hasha dem
 const methodOverride = require("method-override"); // Middleware för PUT och DELETE
 const MongoStore = require("connect-mongo"); //Används för att lagra sessionsdata
+const passport = require("passport");
+const GitHubStrategy = require("passport-github").Strategy;
+
+passport.use(
+  new GitHubStrategy(
+    {
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: "http://localhost:3000/auth/github/callback",
+    },
+    function (accessToken, refreshToken, profile, cb) {
+      // Här kan du hantera användarinformationen, t.ex. spara i din databas
+      return cb(null, profile);
+    }
+  )
+);
+
+// Sessionhantering (valfritt beroende på din användning)
+passport.serializeUser((user, done) => done(null, user));
+passport.deserializeUser((obj, done) => done(null, obj));
+
+app.use(passport.initialize());
 
 const app = express(); // Skapar en instans av appen express som använder
 //middleware-funktioner för att behandla förfrågningar via reg och res
@@ -243,6 +265,7 @@ app.delete("/delete-post/:id", requireLogin, isAdmin, async (req, res) => {
     await Post.findByIdAndDelete(req.params.id);
     res.redirect("/"); //Användaren omdirigeras till startsidan efter att inlägget raderats
   } catch (error) {
+    //Fångar upp eventuella fel och förhindrar serverkrascher samt tillåter korrekt felhantering.
     console.error(error);
     res.status(500).send("Internt serverfel"); //Om ett fel uppstår loggas ett felmeddelande i konsollen
   }
