@@ -30,6 +30,9 @@ passport.deserializeUser((obj, done) => done(null, obj));
 
 app.use(passport.initialize());
 
+//Rutt som omdirigerar användaren till GitHub för autentisering
+app.get("/auth/github", passport.authenticate("github"));
+
 const app = express(); // Skapar en instans av appen express som använder
 //middleware-funktioner för att behandla förfrågningar via reg och res
 const port = 3000; //Anger porten som appen express ska lyssna på
