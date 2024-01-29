@@ -10,6 +10,7 @@ const MongoStore = require("connect-mongo"); //Används för att lagra sessionsd
 const passport = require("passport");
 const GitHubStrategy = require("passport-github").Strategy;
 
+//Autentisering via GitHub (OAuth)
 passport.use(
   new GitHubStrategy(
     {
@@ -18,17 +19,25 @@ passport.use(
       callbackURL: "http://localhost:3000/auth/github/callback",
     },
     function (accessToken, refreshToken, profile, cb) {
-      // Här kan du hantera användarinformationen, t.ex. spara i din databas
+      //Hanterar användarinformation, t.ex. sparar i databasen
       return cb(null, profile);
     }
   )
 );
 
-// Sessionhantering (valfritt beroende på din användning)
+//Sessionhantering
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((obj, done) => done(null, obj));
 
 app.use(passport.initialize());
+
+app.get(
+  "/auth/github/callback",
+  passport.authenticate("github", { failureRedirect: "/login" }),
+  function (req, res) {
+    res.redirect("/"); //Autentisering lyckades och användaren omdirigeras till rot-URL
+  }
+);
 
 //Rutt som omdirigerar användaren till GitHub för autentisering
 app.get("/auth/github", passport.authenticate("github"));
