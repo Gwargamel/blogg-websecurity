@@ -54,22 +54,23 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 //Kontrollerar om en användare har admin-behörighet
-const isAdmin = (req, res, next) => {
-  if (req.session.userId) {
-    User.findById(req.session.userId, (err, user) => {
-      if (err || !user) {
-        res.status(401).send("App, app, app... Du saknar behörighet");
-      } else if (user.isAdmin) {
-        next(); //Användaren godkänns som administratör
-      } else {
-        res
-          .status(403) //Användare utan behörighet får ett felmeddelande
-          .send("Endast administratörer har tillgång till denna funktion");
-      }
-    });
-  } else {
-    //Användare utan behörighet får ett felmeddelande
-    res.status(401).send("Du måste vara inloggad");
+const isAdmin = async (req, res, next) => {
+  if (!req.session.userId) {
+    return res.status(401).send("Du måste vara inloggad");
+  }
+
+  try {
+    const user = await User.findById(req.session.userId);
+    if (user && user.isAdmin) {
+      return next(); // Användaren är admin och kan fortsätta
+    } else {
+      return res
+        .status(403)
+        .send("Endast administratörer har tillgång till denna funktion");
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internt serverfel");
   }
 };
 
