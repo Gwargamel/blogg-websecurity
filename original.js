@@ -221,12 +221,11 @@ app.get("/logout", (req, res) => {
 
     // Renderar en sida med användar- och inläggsdata
     res.render("index", { user: user, posts: posts });
-  } catch (error) {
+   catch (error) {
     //Catch fångar upp eventuella fel
     console.error(error); //Felmeddelande loggas i konsollen
     res.redirect("/"); //Omdirigerar användaren tillbaka till startsidan
   }
-});
 
 // /create-post-rutten renderar en vy där användaren kan skapa ett blogginlägg
 app.get("/create-post", requireLogin, async (req, res) => {
