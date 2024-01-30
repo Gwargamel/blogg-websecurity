@@ -10,6 +10,28 @@ const MongoStore = require("connect-mongo"); //Används för att lagra sessionsd
 const passport = require("passport");
 const GitHubStrategy = require("passport-github").Strategy;
 
+const app = express(); // Skapar en instans av appen express som använder
+//middleware-funktioner för att behandla förfrågningar via reg och res
+const port = 3000; //Anger porten som appen express ska lyssna på
+
+//Ansluter till databasen (MongoDB) via Mongoose
+mongoose.connect("mongodb://localhost/blog", {});
+
+//Konfigurerar användningen av MongoStore för att spara sessionsdata
+app.use(
+  session({
+    secret: "your-secret-key", //Använder en hemlig nyckel signera session-ID-cookie
+    resave: false, //Sessionen sparas ej tillbaka till session store
+    saveUninitialized: false, //En ny, och ej modifierad, session sparas ej till store
+    store: MongoStore.create({
+      mongoUrl: "mongodb://localhost/blog", //Adress till Mongo-databasen där sessionsdata skall lagras
+      collectionName: "sessions", //Samlingen i MongoDB där sessionsdata sparas
+    }),
+    cookie: { maxAge: 1000 * 60 * 60 }, //Anger livslängden på cookies (1h)
+  })
+);
+
+/*
 //Autentisering via GitHub (OAuth)
 passport.use(
   new GitHubStrategy(
@@ -42,26 +64,50 @@ app.get(
 //Rutt som omdirigerar användaren till GitHub för autentisering
 app.get("/auth/github", passport.authenticate("github"));
 
-const app = express(); // Skapar en instans av appen express som använder
-//middleware-funktioner för att behandla förfrågningar via reg och res
-const port = 3000; //Anger porten som appen express ska lyssna på
+*/
 
-//Ansluter till databasen (MongoDB) via Mongoose
-mongoose.connect("mongodb://localhost/blog", {});
-
-//Konfigurerar användningen av MongoStore för att spara sessionsdata
-app.use(
-  session({
-    secret: "your-secret-key", //Använder en hemlig nyckel signera session-ID-cookie
-    resave: false, //Sessionen sparas ej tillbaka till session store
-    saveUninitialized: false, //En ny, och ej modifierad, session sparas ej till store
-    store: MongoStore.create({
-      mongoUrl: "mongodb://localhost/blog", //Adress till Mongo-databasen där sessionsdata skall lagras
-      collectionName: "sessions", //Samlingen i MongoDB där sessionsdata sparas
+// Första steget är att få en access code från GitHub.
+// Vi omdirigerar requests till Github där man sedan får logga in.
+app.get("/auth/github", (_req, res) => {
+  const authUrl =
+    "https://github.com/login/oauth/authorize?client_id=169b8ab064c8f1386757"; //Client ID finns i inställningarna för GitHub.
+  res.redirect(authUrl);
+});
+// Hit kommer vi med en kod som kan användas för att bytas mot en token.
+app.get("/auth/github/callback", async (req, res) => {
+  const code = req.query.code;
+  // Här får vi själva access_token
+  const response = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    body: new URLSearchParams({
+      client_id: "b68e6874e5f21942b543",
+      client_secret: "", //Din nyckel
+      code: code,
     }),
-    cookie: { maxAge: 1000 * 60 * 60 }, //Anger livslängden på cookies (1h)
-  })
-);
+    // Vi vill ha vår token i JSON-format
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const jsonResponse = await response.json();
+  req.session.username = await getUserInfoFromGitHub(jsonResponse.access_token);
+  res.send("Authentication successful!");
+});
+const getUserInfoFromGitHub = async (access_token) => {
+  const response = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  });
+  return await response.json();
+};
+//Hämtar användarinformation med token
+app.get("/user", async (req, res) => {
+  if (!req.session.access_token) {
+    res.status(403).send("Access Denied.");
+  }
+  res.send(await response.json());
+});
 
 // Variabel som definierar blogginläggens struktur
 const Post = mongoose.model("Post", {
