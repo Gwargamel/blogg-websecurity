@@ -142,3 +142,8 @@ app.get("/"),
       res.redirect("/");
     }
   };
+
+// Starta servern
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
