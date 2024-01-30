@@ -1,70 +1,106 @@
-// Importera nödvändiga paket och moduler
-const helmet = require("helmet"); // Ökar säkerheten genom att ställa in olika HTTP-headers
-const express = require("express"); // Ramverk för att skapa webbapplikationer
-const mongoose = require("mongoose"); // Används för att arbeta med MongoDB-databaser
-const session = require("express-session"); // Middleware för sessionshantering
-const bcrypt = require("bcrypt"); // Används för att kryptera lösenord
-const methodOverride = require("method-override"); // Middleware för att stödja PUT och DELETE requests i formulär
-const MongoStore = require("connect-mongo"); // Används för att lagra sessionsdata i MongoDB
-// const passport = require("passport"); // Används för autentisering (kommenterad eftersom den inte används i den här koden)
-// const GitHubStrategy = require("passport-github").Strategy; // GitHub strategi för passport (kommenterad eftersom den inte används i den här koden)
+//Importerar nödvändiga paket och moduler (de skall finnas angivna i package.json)
+//som behövs för att bygga och köra webapplikationen d.v.s. själva bloggen
+const helmet = require("helmet"); //Ökar säkerheten med hjälp av HTTP-headers
+const express = require("express"); //Ramverk för att skapa webbapplikationer med Node.js
+const mongoose = require("mongoose"); //Behövs för att arbeta med databaser i MongoDB
+const session = require("express-session"); // Middleware för sessionshantering i Express
+const bcrypt = require("bcrypt"); //Krypterar användarnas lösenord genom att hasha dem
+const methodOverride = require("method-override"); // Middleware för PUT och DELETE
+const MongoStore = require("connect-mongo"); //Används för att lagra sessionsdata
+const passport = require("passport");
+const GitHubStrategy = require("passport-github").Strategy;
 
-const app = express(); // Skapar en Express-applikation
-const port = 3000; // Port som servern kommer att lyssna på
+const app = express(); // Skapar en instans av appen express som använder
+//middleware-funktioner för att behandla förfrågningar via reg och res
+const port = 3000; //Anger porten som appen express ska lyssna på
 
-// Anslut till MongoDB-databasen
+//Ansluter till databasen (MongoDB) via Mongoose
 mongoose.connect("mongodb://localhost/blog", {});
 
-// Konfigurera sessionshantering med MongoStore
+//Konfigurerar användningen av MongoStore för att spara sessionsdata
 app.use(
   session({
-    secret: "your-secret-key", // Hemlig nyckel för att signera session-ID-cookies
-    resave: false, // Hindrar sessionen från att sparas tillbaka till session store om den inte ändrats
-    saveUninitialized: false, // Hindrar omodifierade sessioner från att sparas
+    secret: "your-secret-key", //Använder en hemlig nyckel signera session-ID-cookie
+    resave: false, //Sessionen sparas ej tillbaka till session store
+    saveUninitialized: false, //En ny, och ej modifierad, session sparas ej till store
     store: MongoStore.create({
-      mongoUrl: "mongodb://localhost/blog", // MongoDB URL där sessionsdata lagras
-      collectionName: "sessions", // MongoDB-samling där sessionsdata lagras
+      mongoUrl: "mongodb://localhost/blog", //Adress till Mongo-databasen där sessionsdata skall lagras
+      collectionName: "sessions", //Samlingen i MongoDB där sessionsdata sparas
     }),
-    cookie: { maxAge: 1000 * 60 * 60 }, // Sätter max livslängd på cookies (1 timme)
+    cookie: { maxAge: 1000 * 60 * 60 }, //Anger livslängden på cookies (1h)
   })
 );
 
-// Middleware för ökad säkerhet och hantering av inkommande data
-app.use(helmet());
-app.use(express.urlencoded({ extended: true }));
-app.use(methodOverride("_method"));
 
-// Ställ in EJS som vy-motor och använd statiska filer från 'public'-mappen
-app.set("view engine", "ejs");
-app.use(express.static("public"));
-
-// Schema och modell för användare och blogginlägg
-const userSchema = new mongoose.Schema({
-  username: String,
-  password: String,
-  signature: String,
-  isAdmin: { type: Boolean, default: false },
+// Första steget är att få en access code från GitHub.
+// Vi omdirigerar requests till Github där man sedan får logga in.
+app.get("/auth/github", (_req, res) => {
+  const authUrl =
+    "https://github.com/login/oauth/authorize?client_id=169b8ab064c8f1386757"; //Client ID finns i inställningarna för GitHub.
+  res.redirect(authUrl);
 });
-const User = mongoose.model("User", userSchema);
+// Hit kommer vi med en kod som kan användas för att bytas mot en token.
+app.get("/auth/github/callback", async (req, res) => {
+  const code = req.query.code;
+  // Här får vi själva access_token
+  const response = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    body: new URLSearchParams({
+      client_id: "b68e6874e5f21942b543",
+      client_secret: "", //Din nyckel
+      code: code,
+    }),
+    // Vi vill ha vår token i JSON-format
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const jsonResponse = await response.json();
+  req.session.username = await getUserInfoFromGitHub(jsonResponse.access_token);
+  res.send("Authentication successful!");
+});
+const getUserInfoFromGitHub = async (access_token) => {
+  const response = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  });
+  return await response.json();
+};
+//Hämtar användarinformation med token
+app.get("/user", async (req, res) => {
+  if (!req.session.access_token) {
+    res.status(403).send("Access Denied.");
+  }
+  res.send(await response.json());
+});
 
+// Variabel som definierar blogginläggens struktur
 const Post = mongoose.model("Post", {
   title: String,
-  content: String,
+  content: String, //Titel och innehåll anges i formen av strängar
   author: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "User", //Användarnamnet publiceras vid inlägget
   },
   signature: String,
   createdAt: {
     type: Date,
-    default: Date.now,
+    default: Date.now, //Datum när blogginlägget skapades pupliceras också
   },
 });
 
-// Middleware för att kontrollera om en användare har admin-behörighet
+const userSchema = new mongoose.Schema({
+  username: String,
+  password: String,
+  signature: String,
+  isAdmin: { type: Boolean, default: false }, //Fastslår om användaren är admin eller ej
+});
+
+const User = mongoose.model("User", userSchema);
+
+//Kontrollerar om en användare har admin-behörighet
 const isAdmin = async (req, res, next) => {
-  // ... (Koden för isAdmin-middleware här) ...
-  //Kontrollerar om en användare har admin-behörighet
   if (!req.session.userId) {
     return res.status(401).send("Du måste vara inloggad");
   }
@@ -84,9 +120,21 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
-// Middleware för att kontrollera om användaren är inloggad
+// Middleware-inställningar som ökar säkerheten och hanterar klientförfrågningar samt användarsessioner
+app.use(helmet()); //Använder HTTP-headers för att förhindra t.ex. XSS-attacker, klickjacking etc
+app.use(express.urlencoded({ extended: true })); //Tolkar url-kodad data i POST-förfrågningar
+app.use(methodOverride("_method")); //Tillåter användandet av HTTP-metoder som PUT och DELETE där det ej stöds av klient
+app.use(
+  session({
+    secret: "your-secret-key", //Signerar sessions-ID-cookies
+    resave: true,
+    saveUninitialized: true,
+    cookie: { expires: (maxAge = 1000 * 60 * 60) }, //Loggar ut användaren efter 1h: millisek*sek*min
+  })
+);
+
+//Kontrollerar att användaren är inloggad
 const requireLogin = (req, res, next) => {
-  // ... (Koden för requireLogin-middleware här) ...
   //Arrowfunktion som kontrollerar förfrågan (req) och svaret (res)
   if (!req.session.userId) {
     //Kontrollerar om userID finns i användarens session
@@ -96,8 +144,10 @@ const requireLogin = (req, res, next) => {
   }
 };
 
-// Routes för användarregistrering, inloggning, utloggning och skapande av blogginlägg
-// ... (Koden för dessa routes här) ...
+//Anger EJS (Embedded javascript) som vy-motor för att rendera HTML-sidor
+app.set("view engine", "ejs");
+app.use(express.static("public")); //Express hämtar statiska filer (styles.css) från projektmappen public
+
 // /register-rutten renderar en vy där användaren kan skapa ett konto
 // via ett formulär
 app.get("/register", (req, res) => {
@@ -171,11 +221,12 @@ app.get("/logout", (req, res) => {
 
     // Renderar en sida med användar- och inläggsdata
     res.render("index", { user: user, posts: posts });
-   catch (error) {
+  } catch (error) {
     //Catch fångar upp eventuella fel
     console.error(error); //Felmeddelande loggas i konsollen
     res.redirect("/"); //Omdirigerar användaren tillbaka till startsidan
   }
+});
 
 // /create-post-rutten renderar en vy där användaren kan skapa ett blogginlägg
 app.get("/create-post", requireLogin, async (req, res) => {
@@ -228,52 +279,19 @@ app.post("/create-post", requireLogin, async (req, res) => {
   }
 });
 
-// Route för att hantera OAuth-autentisering med GitHub (kan tas bort om inte använd)
-app.get("/auth/github", (_req, res) => {
-  // ... (Koden för GitHub OAuth-autentisering här) ...
-  const authUrl =
-    "https://github.com/login/oauth/authorize?client_id=169b8ab064c8f1386757"; //Client ID finns i inställningarna för GitHub.
-  res.redirect(authUrl);
-});
-
-app.get("/auth/github/callback", async (req, res) => {
-  // ... (Koden för GitHub OAuth callback här) ...
-  // Hit kommer vi med en kod som kan användas för att bytas mot en token.
-  const code = req.query.code;
-  // Här får vi själva access_token
-  const response = await fetch("https://github.com/login/oauth/access_token", {
-    method: "POST",
-    body: new URLSearchParams({
-      client_id: "b68e6874e5f21942b543",
-      client_secret: "", //Din nyckel
-      code: code,
-    }),
-    // Vi vill ha vår token i JSON-format
-    headers: {
-      Accept: "application/json",
-    },
-  });
-  const jsonResponse = await response.json();
-  req.session.username = await getUserInfoFromGitHub(jsonResponse.access_token);
-  res.send("Authentication successful!");
-});
-const getUserInfoFromGitHub = async (access_token) => {
-  const response = await fetch("https://api.github.com/user", {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-  });
-  return await response.json();
-};
-//Hämtar användarinformation med token
-app.get("/user", async (req, res) => {
-  if (!req.session.access_token) {
-    res.status(403).send("Access Denied.");
+app.delete("/delete-post/:id", requireLogin, isAdmin, async (req, res) => {
+  //isAdmin undersöker om användaren har admin-behörigheter
+  try {
+    await Post.findByIdAndDelete(req.params.id);
+    res.redirect("/"); //Användaren omdirigeras till startsidan efter att inlägget raderats
+  } catch (error) {
+    //Fångar upp eventuella fel och förhindrar serverkrascher samt tillåter korrekt felhantering.
+    console.error(error);
+    res.status(500).send("Internt serverfel"); //Om ett fel uppstår loggas ett felmeddelande i konsollen
   }
-  res.send(await response.json());
 });
 
-// Starta servern
+//Startar servern genom att åkalla variabeln port
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
