@@ -83,6 +83,32 @@ const requireLogin = (req, res, next) => {
   }
 };
 
+//En expressrutt hanterar GET-förfrågningar till rot-URL
+app.get("/", async (req, res) => {
+  try {
+    let user; //Anger variabeln user
+
+    //En if-else-sats kontrollerar om det finns ett userId i sessionen
+    if (req.session.userId) {
+      //Om userId finns, hämtas användaren från databasen
+      user = await User.findById(req.session.userId).exec();
+    } else {
+      //Om userId ej finns sätts user till null
+      user = null;
+    }
+
+    // Hämtar alla blogginlägg, sorterade efter datum
+    const posts = await Post.find().sort({ createdAt: "desc" }).exec();
+
+    // Renderar en sida med användar- och inläggsdata
+    res.render("index", { user: user, posts: posts });
+  } catch (error) {
+    //Catch fångar upp eventuella fel
+    console.error(error); //Felmeddelande loggas i konsollen
+    res.redirect("/"); //Omdirigerar användaren tillbaka till startsidan
+  }
+});
+
 // Definiera routes för användarregistrering, inloggning, utloggning, och skapande av inlägg
 app.get("/register", (req, res) => {
   res.render("register");
@@ -128,22 +154,103 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/"),
-  async (req, res) => {
-    try {
-      let user = null;
-      if (req.session.userId) {
-        user = await User.findById(req.session.userId).exec();
-      }
-      const posts = await Post.find().sort({ createdAt: "desc" }).exec();
-      res.render("index", { user, posts });
-    } catch (error) {
-      console.error(error);
-      res.redirect("/");
+// /create-post-rutten renderar en vy där användaren kan skapa ett blogginlägg
+app.get("/create-post", requireLogin, async (req, res) => {
+  //Asyncron-funktion som hanterar inkommande GET-förfrågningar
+  //requireLogin kontrollerar att användaren är inloggad vilket krävs för att skriva ett inlägg
+  try {
+    //Kontrollerar om det finns ett userId i den aktuella sessionen
+    const user = req.session.userId //En ternär operator, ?, används istället för if-else
+      ? await User.findById(req.session.userId).exec() //Hämtar användarens information från databasen
+      : null; //Om användaren ej är inloggad sätts userId till null
+
+    res.render("create-post", { user: user }); //Skickar en HTML-sida till klienten med datan user
+  } catch (error) {
+    //Fångar upp eventuella fel
+    console.error(error); //Felmeddelande loggas i konsollen
+    res.redirect("/"); //Omdirigerar användaren tillbaka till startsidan
+  }
+});
+
+//Hanterar POST-förfrågan om att skapa nya blogginlägg
+app.post("/create-post", requireLogin, async (req, res) => {
+  //skapar en route-hanterare för POST-förfrågningar till /create-post.
+  //requireLogin är en middleware-funktion som körs före den asynkrona callback-funktionen och
+  //kräver att en användare är inloggad för att kunna publicera ett inlägg
+  const { title, content } = req.body;
+
+  try {
+    //try-catch används för att fånga upp eventuella fel
+    const user = await User.findById(req.session.userId);
+    //Hämtar användardata från databasen baserat på användarens ID i sessionen
+
+    if (!user) {
+      throw new Error("User not found"); //Om user inte hittas uppstår ett fel
     }
-  };
+
+    //Skapar ett nytt blogginlägg som innehåller: titel, text, författarens id och användarnamn
+    const newPost = new Post({
+      title: title,
+      content: content,
+      author: user._id,
+      signature: user.username,
+    });
+
+    await newPost.save(); //Det nya inlägget sparas i databasen
+    res.redirect("/"); //Användaren omdirigeras till startsidan
+  } catch (error) {
+    //Fångar upp eventuella fel under processen
+    console.error(error); //Ett felmeddelande loggas i konsollen
+    res.redirect("/create-post"); //Användaren omdirigeras tillbaka till formuläret för att skapa nytt inlägg
+  }
+});
 
 // Starta servern
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+/*
+// Första steget är att få en access code från GitHub.
+// Vi omdirigerar requests till Github där man sedan får logga in.
+app.get("/auth/github", (_req, res) => {
+  const authUrl =
+    "https://github.com/login/oauth/authorize?client_id=b68e6874e5f21942b543"; //Client ID finns i inställningarna för GitHub.
+  res.redirect(authUrl);
+});
+// Hit kommer vi med en kod som kan användas för att bytas mot en token.
+app.get("/auth/github/callback", async (req, res) => {
+  const code = req.query.code;
+  // Här får vi själva access_token
+  const response = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    body: new URLSearchParams({
+      client_id: "b68e6874e5f21942b543",
+      client_secret: "",//Din nyckel
+      code: code,
+    }),
+    // Vi vill ha vår token i JSON-format
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const jsonResponse = await response.json();
+  req.session.username = await getUserInfoFromGitHub(jsonResponse.access_token)
+  res.send("Authentication successful!");
+});
+const getUserInfoFromGitHub = async (access_token) => {
+  const response = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  });
+  return await response.json();
+};
+//Hämtar användarinformation med token
+app.get("/user", async (req, res) => {
+  if (!req.session.access_token) {
+    res.status(403).send("Access Denied.");
+  }
+  res.send(await response.json());
+});
+*/
