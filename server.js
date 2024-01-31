@@ -65,7 +65,7 @@ const Post = mongoose.model("Post", {
 const isAdmin = async (req, res, next) => {
 	if (!req.session.userId) {
 		//Undersöker om sessionen har ett användar-ID
-		return res.status(401).send("Du måste vara inloggad");
+		return res.status(401).send("401: Du måste vara inloggad");
 		//Om inte returneras en statuskod och ett felmeddelande
 	}
 
@@ -78,7 +78,7 @@ const isAdmin = async (req, res, next) => {
 		} else {
 			return res //Om användaren ej är admin returneras ett felmeddelande
 				.status(403)
-				.send("Endast administratörer har tillgång till denna funktion");
+				.send("403: Endast administratörer har tillgång till denna funktion");
 		}
 	} catch (error) {
 		//Om ett fel uppstår returneras ett felmeddelande
@@ -188,7 +188,7 @@ const getUserInfoFromGitHub = async (access_token) => {
 app.get("/user", async (req, res) => {
 	if (!req.session.access_token) {
 		//Kontrollerar om det finns en access token i användarsessionen.
-		res.status(403).send("Access Denied."); //Om det ej finns returneras ett felmeddelande till klienten
+		res.status(403).send("403: Access Denied."); //Om det ej finns returneras ett felmeddelande till klienten
 	}
 	res.send(await response.json()); //Skickar svar till klienten
 });
@@ -227,14 +227,12 @@ app.post("/login", async (req, res) => {
 			res.redirect("/"); //Om användaren angivit korrekt information omdirigeras de till sin sida
 		} else {
 			//Om användaren angivit felaktiga inloggningsuppgifter får de ett felmeddelande
-			res
-				.status(401)
-				.send("Du har angivit felaktiga uppgifter. YOU SHALL NOT PASS");
+			res.status(401).send("401: Åtkomst nekad (YOU SHALL NOT PASS!)");
 		}
 	} catch (error) {
 		//Fångar upp eventuella fel
 		console.error(error);
-		res.status(500).send("Internt serverfel"); //Felmeddelande loggas i konsollen
+		res.status(500).send("500: Internt serverfel"); //Felmeddelande loggas i konsollen
 	}
 });
 
@@ -301,7 +299,7 @@ const canDeletePost = async (req, res, next) => {
 	//Undersöker om det finns en användar-ID i sessionen
 	if (!req.session.userId) {
 		//Om inget ID finns returneras ett felmeddelande
-		return res.status(401).send("Du måste vara inloggad");
+		return res.status(401).send("401: Åtkomst nekad. Du måste vara inloggad");
 	}
 
 	try {
@@ -310,7 +308,7 @@ const canDeletePost = async (req, res, next) => {
 
 		if (!post) {
 			//Om inget inlägg hittas returneras ett felmeddelande
-			return res.status(404).send("Inlägget hittades inte");
+			return res.status(404).send("404: Inlägget hittades inte");
 		}
 
 		//Kontrollerar behörighet för radering av inlägg
@@ -321,12 +319,14 @@ const canDeletePost = async (req, res, next) => {
 		} else {
 			return res //Om nej returneras statuskod 403 och ett felmeddelande
 				.status(403)
-				.send("Du har inte behörighet att radera detta inlägg");
+				.send(
+					"403: Ej tillåtet. Du har inte behörighet att radera detta inlägg"
+				);
 		}
 	} catch (error) {
 		//Fångar upp eventuella fel
 		console.error(error);
-		return res.status(500).send("Internt serverfel");
+		return res.status(500).send("500: Internt serverfel");
 	}
 };
 
@@ -343,7 +343,7 @@ app.delete(
 		} catch (error) {
 			//Fångar upp eventuella fel och loggar dem
 			console.error(error);
-			res.status(500).send("Internt serverfel"); //Returnerar en statuskod för felet
+			res.status(500).send("500: Internt serverfel"); //Returnerar en statuskod för felet
 		}
 	}
 );
