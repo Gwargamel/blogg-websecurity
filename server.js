@@ -83,6 +83,49 @@ const requireLogin = (req, res, next) => {
   }
 };
 
+// Första steget är att få en access code från GitHub.
+// Vi omdirigerar requests till Github där man sedan får logga in.
+app.get("/auth/github", (_req, res) => {
+  const authUrl =
+    "https://github.com/login/oauth/authorize?client_id=b68e6874e5f21942b543"; //Client ID finns i inställningarna för GitHub.
+  res.redirect(authUrl);
+});
+// Hit kommer vi med en kod som kan användas för att bytas mot en token.
+app.get("/auth/github/callback", async (req, res) => {
+  const code = req.query.code;
+  // Här får vi själva access_token
+  const response = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    body: new URLSearchParams({
+      client_id: "169b8ab064c8f1386757",
+      client_secret: "3eb04288fa9da0d1f205db2c7215474eff9d997a", //Din nyckel
+      code: code,
+    }),
+    // Vi vill ha vår token i JSON-format
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const jsonResponse = await response.json();
+  req.session.username = await getUserInfoFromGitHub(jsonResponse.access_token);
+  res.send("Authentication successful!");
+});
+const getUserInfoFromGitHub = async (access_token) => {
+  const response = await fetch("https://api.github.com/user", {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  });
+  return await response.json();
+};
+//Hämtar användarinformation med token
+app.get("/user", async (req, res) => {
+  if (!req.session.access_token) {
+    res.status(403).send("Access Denied.");
+  }
+  res.send(await response.json());
+});
+
 //En expressrutt hanterar GET-förfrågningar till rot-URL
 app.get("/", async (req, res) => {
   try {
@@ -205,52 +248,51 @@ app.post("/create-post", requireLogin, async (req, res) => {
   }
 });
 
+// Middleware för att kontrollera om användaren kan radera inlägget
+const canDeletePost = async (req, res, next) => {
+  if (!req.session.userId) {
+    return res.status(401).send("Du måste vara inloggad");
+  }
+
+  try {
+    const post = await Post.findById(req.params.id).exec();
+    const user = await User.findById(req.session.userId);
+
+    if (!post) {
+      return res.status(404).send("Inlägget hittades inte");
+    }
+
+    // Tillåt radering om användaren är administratör eller ägare av inlägget
+    if (user.isAdmin || post.author.equals(user._id)) {
+      return next();
+    } else {
+      return res
+        .status(403)
+        .send("Du har inte behörighet att radera detta inlägg");
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internt serverfel");
+  }
+};
+
+// Uppdaterad route för att radera inlägg
+app.delete(
+  "/delete-post/:id",
+  requireLogin,
+  canDeletePost,
+  async (req, res) => {
+    try {
+      await Post.findByIdAndDelete(req.params.id);
+      res.redirect("/");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internt serverfel");
+    }
+  }
+);
+
 // Starta servern
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-
-/*
-// Första steget är att få en access code från GitHub.
-// Vi omdirigerar requests till Github där man sedan får logga in.
-app.get("/auth/github", (_req, res) => {
-  const authUrl =
-    "https://github.com/login/oauth/authorize?client_id=b68e6874e5f21942b543"; //Client ID finns i inställningarna för GitHub.
-  res.redirect(authUrl);
-});
-// Hit kommer vi med en kod som kan användas för att bytas mot en token.
-app.get("/auth/github/callback", async (req, res) => {
-  const code = req.query.code;
-  // Här får vi själva access_token
-  const response = await fetch("https://github.com/login/oauth/access_token", {
-    method: "POST",
-    body: new URLSearchParams({
-      client_id: "b68e6874e5f21942b543",
-      client_secret: "",//Din nyckel
-      code: code,
-    }),
-    // Vi vill ha vår token i JSON-format
-    headers: {
-      Accept: "application/json",
-    },
-  });
-  const jsonResponse = await response.json();
-  req.session.username = await getUserInfoFromGitHub(jsonResponse.access_token)
-  res.send("Authentication successful!");
-});
-const getUserInfoFromGitHub = async (access_token) => {
-  const response = await fetch("https://api.github.com/user", {
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-    },
-  });
-  return await response.json();
-};
-//Hämtar användarinformation med token
-app.get("/user", async (req, res) => {
-  if (!req.session.access_token) {
-    res.status(403).send("Access Denied.");
-  }
-  res.send(await response.json());
-});
-*/
