@@ -1,20 +1,5 @@
 [{
   "_id": {
-    "$oid": "659ebc0d4fb391472c4ed44b"
-  },
-  "title": "Din Guide Till Proteinpulver",
-  "content": "Proteinpulver. Förmodligen det första kosttillskottet du hörde talas om, och av goda anledningar.\r\n\r\n\"Om du vill bygga muskler, måste du skaffa proteinpulver.\"\r\n\r\nDet var det första tipset jag fick kring kosttillskott och muskelbyggande.\r\n\r\nDet är dock fel.\r\n\r\nAtt få i sig tillräckligt med protein kommer att hjälpa dig bygga muskler, men det är ingen nödvändighet att du får i dig detta via pulver specifikt.\r\n\r\nEn proteinrik och varierad kost är egentligen allt du behöver för att maximera muskeltillväxten.\r\n\r\nProteinpulver är alltså inte magiskt, så varför är det så populärt? Och vilken typ av proteinpulver är bäst för vem och varför?\r\n\r\nDet finns många olika proteinpulver att välja på - whey, kasien, egg, soja, ärtor, ris och många fler - där de även har underkategorier, såsom whey isolat och koncentrat.\r\n\r\nMed andra ord är hela proteinpulver-diskussionen full av frågetecken.",
-  "author": {
-    "$oid": "659ebbbe4fb391472c4ed443"
-  },
-  "signature": "Gymbrosunited",
-  "createdAt": {
-    "$date": "2024-01-10T15:47:25.093Z"
-  },
-  "__v": 0
-},
-{
-  "_id": {
     "$oid": "659ebc5b4fb391472c4ed455"
   },
   "title": "Nallebjörnarnas Picknic",
@@ -30,21 +15,6 @@
 },
 {
   "_id": {
-    "$oid": "659ec3bf088875e20536e2bb"
-  },
-  "title": "En tidlös look!",
-  "content": "Jag har en outfit-look som jag bar i tonåren, bär nu och säkert kan klä mig i om 20 år också. Det är jeans, skjorta, kavaj, fin väska, klackar, ljusrosa läppar och bubbel gums-lackade naglar.\r\n\r\nDet som har varierat under året är nivån på jeansen midja. I tonåren  köpte jag jeans från Fornarina och midjan var så låg att man fick välja trosor med omsorg. Sedan satt byxorna så hårt att jag fick ligga ner på golvet för att få på mig dom och på kvällen hade jag fått blåmärken. Jag minns att jag inte ens vågade gå på toaletten på dagen för att jag eventuellt inte skulle kunna stänga de igen.\r\n\r\nNär jag blev äldre blev midjan högre och så har det varit i 15 år. MEN nu har till och med jag inspirerats av de yngre och vill ha en lägre midja på jeansen igen. Inte Paris Hilton-låg (tänker inte vaxa mig för ett par byxors skull) men liksom lagom låga. Vuxenlåga.\r\n\r\nJeansens nederdel har också varierat idag bär jag bara flare eller bootcut. Det kommer dröja innan det blir stuprörsjeans igen.",
-  "author": {
-    "$oid": "659ec3a2088875e20536e2b3"
-  },
-  "signature": "Blondinbella",
-  "createdAt": {
-    "$date": "2024-01-10T16:20:15.625Z"
-  },
-  "__v": 0
-},
-{
-  "_id": {
     "$oid": "65a2cc3140a8132dd93e4a46"
   },
   "title": "The Dead Boys: A Legendary Journey in Rock and Roll",
@@ -55,6 +25,36 @@
   "signature": "Nalle",
   "createdAt": {
     "$date": "2024-01-13T17:45:21.314Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65ba0d12301ee0a0118b4899"
+  },
+  "title": "Marknadsföring hos Google",
+  "content": "Vi blir sällan förvånade när en ny uppdatering dyker upp här på kontoret – system förnyas och plattformar får adderade funktioner för att hänga med i det som kallas för den digitala utvecklingen.\r\n\r\nSenast ut är Google som kommit med en rad av nyheter. Efter nästan 18 år har det blivit dags att göra en rejäl uppdatering av sitt marknadsföringserbjudande! 1 juli går gamla AdWords ur tiden och vi kliver in i nya AdWords som under en längre tid varit i en Beta-fas. Nya AdWords har ett modernare utseende och du kommer kunna göra allt där som du kunde i den äldre versionen och lite till. Men det slutar inte där – marknadsföringen i Google AdWords kommer även byta namn till Google Ads.\r\n\r\nTillsammans med sitt nya utseende och Google Ads lanserar även Google två andra nyheter: Google Ad Manager och Google Marketing Platform. Om du vill synas i Googles sökresultat så kan vi kan hjälpa dig med din sökmotorsmarknadsföring – tveka inte att höra av dig!",
+  "author": {
+    "$oid": "65ba03e50ed1d6ca169b9869"
+  },
+  "signature": "Kodninjan",
+  "createdAt": {
+    "$date": "2024-01-31T09:04:18.569Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "65ba131b805a158293a5a442"
+  },
+  "title": " Snäll som Gargamel",
+  "content": "Gargamel är en elak alkemist som håller på med häxbrygder och trollkonster och som ser smurferna som sina fiender. Ibland vill han äta dem och ibland ha dem för att förvandla dem till guld. Han bor tillsammans med sin katt Azraël i ett hus i skogen inte långt från smurfernas by, men har alltid svårt att finna vägen dit. Det sägs att Gargamel skapade smurfarna.\r\n\r\nSå långt är det glasklart som korvspad. Men hur uttalas Garamel? Det finns två skolor nämligen. Den ena, den gamla Gargamel-skolan, säger \"Garagamel\". Den andra, även kallad den nya Gargamel-skolan, hävdar att det ska uttalas \"Gargamél\".\r\n\r\nSvenska Akademin med Horace, Pär och Sture i spetsen har lovat att titta över saken. De säger sig ska suga på saken, som en julgaramel över de kommande helgerna. Kan dock bli en något besk eftersmak om det finns häxbrygd och trollkonst med bland ingredienserna.",
+  "author": {
+    "$oid": "65ba12d9805a158293a5a43c"
+  },
+  "signature": "Gwargamel",
+  "createdAt": {
+    "$date": "2024-01-31T09:30:03.400Z"
   },
   "__v": 0
 }]

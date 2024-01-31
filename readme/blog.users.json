@@ -4,37 +4,24 @@
   },
   "username": "Nalle",
   "password": "$2b$10$Vcq6b2Am/6rWaxzqoOWlYOQIe6fVv2/0bl1BD1Kf1SWoa1HOmtRpi",
+  "__v": 0,
+  "isAdmin": true
+},
+{
+  "_id": {
+    "$oid": "65ba03e50ed1d6ca169b9869"
+  },
+  "username": "Kodninjan",
+  "password": "$2b$10$VrxOqOZve.5CEEUUcSPI.eM4KyvBegQkzI2xb.sPG93cK9KaJ3.DC",
+  "isAdmin": false,
   "__v": 0
 },
 {
   "_id": {
-    "$oid": "659ebbbe4fb391472c4ed443"
+    "$oid": "65ba12d9805a158293a5a43c"
   },
-  "username": "Gymbrosunited",
-  "password": "$2b$10$oq231Mr3TV5BIGoc8V8AJeAPSCmGwL2p41erTwu9hX8BAuCZTbOxu",
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "659ec3a2088875e20536e2b3"
-  },
-  "username": "Blondinbella",
-  "password": "$2b$10$freX37LSwudCVlkqlhiJ2uX8Xi8oT8J4Nc1Y4WSysCHdqsad4scqe",
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "65a536d80a9099354b02029e"
-  },
-  "username": "Kackel",
-  "password": "$2b$10$ozpVwB/v0fFK.8200FuBwO0wwS..85NfaV9/HZP.jI3bS9tsaKEFu",
-  "__v": 0
-},
-{
-  "_id": {
-    "$oid": "65a536f90a9099354b0202a1"
-  },
-  "username": "Adam",
-  "password": "$2b$10$g0OlSuc/qPTDrWTIxHc53ubCPiquWZ0mBYECfIHxtxtfvmHVzaZGS",
+  "username": "Gwargamel",
+  "password": "",
+  "isAdmin": false,
   "__v": 0
 }]
