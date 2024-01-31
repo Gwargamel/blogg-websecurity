@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt"); //Krypterar användarnas lösenord genom att h
 const methodOverride = require("method-override"); //Middleware för PUT och DELETE
 const MongoStore = require("connect-mongo"); //Används för att lagra sessionsdata
 
-const app = express(); // Skapar en instans av appen express som använder middleware-funktioner
+const app = express(); //Skapar en instans av appen express som använder middleware-funktioner
 //för att behandla förfrågningar via reg och res
 const port = 3000; //Anger porten som express ska lyssna på
 
@@ -17,7 +17,7 @@ mongoose.connect("mongodb://localhost/blog", {});
 //Konfigurerar användningen av MongoStore för att spara sessionsdata
 app.use(
 	session({
-		secret: "your-secret-key", //Använder en hemlig nyckel signera session-ID-cookie
+		secret: "your-secret-key", //Använder en hemlig nyckel för att signera sessions-ID-cookien
 		resave: false, //Sessionen sparas ej tillbaka till session store
 		saveUninitialized: false, //En ny, och ej modifierad, session sparas ej till store
 		store: MongoStore.create({
@@ -28,7 +28,7 @@ app.use(
 	})
 );
 
-// Använd middleware för säkerhet och hantering av inkommande data
+//Middleware för säkerhet och hantering av inkommande data
 app.use(helmet()); //Använder HTTP-headers för att förhindra t.ex. XSS-attacker, klickjacking etc
 app.use(express.urlencoded({ extended: true })); //Tolkar url-kodad data i POST-förfrågningar
 app.use(methodOverride("_method")); //Tillåter användandet av HTTP-metoder som PUT och DELETE där det ej stöds av klient
@@ -59,16 +59,20 @@ const Post = mongoose.model("Post", {
 	//Publicerar datum för när blogginlägget skapades
 });
 
-//Middleware för att kontrollera admin-behörighet
+//Middlewarefunktion för att kontrollera admin-behörighet
 const isAdmin = async (req, res, next) => {
 	if (!req.session.userId) {
+		//Undersöker om sessionen har ett användar-ID
 		return res.status(401).send("Du måste vara inloggad");
+		//Om inte returneras en statuskod och ett felmeddelande
 	}
 
 	try {
+		//Letar efter användarinformation i databasen
 		const user = await User.findById(req.session.userId);
 		if (user && user.isAdmin) {
-			return next(); //Användaren är admin och kan fortsätta
+			//Kontrollerar att användaren är admin samt har korrekta användaruppgifter
+			return next(); //Om Ja = skickas vidare till nästa middleware
 		} else {
 			return res //Om användaren ej är admin returneras ett felmeddelande
 				.status(403)
