@@ -1,24 +1,24 @@
 <%- include('header') %>
 
 <main>
-  <!-- Formulär för att skapa en ny användare med fält för att ange användarnamn och lösenord -->
-  <h1>Registrera ny användare</h1>
-  <form action="/register" method="POST">
-    <label for="username">Användarnamn:</label>
-    <input type="text" id="username" name="username" required />
+	<!-- Formulär för att skapa en ny användare med fält för att ange användarnamn och lösenord -->
+	<h1>Registrera ny användare</h1>
+	<form action="/register" method="POST">
+		<label for="username">Användarnamn:</label>
+		<input type="text" id="username" name="username" required />
 
-    <label for="password">Lösenord:</label>
-    <input type="password" id="password" name="password" required />
+		<label for="password">Lösenord:</label>
+		<input type="password" id="password" name="password" required />
 
-    <!-- Knapp för att spara de nya användaruppgifterna -->
-    <button type="submit">Registrera</button>
-  </form>
+		<!-- Knapp för att spara de nya användaruppgifterna -->
+		<button type="submit">Registrera</button>
+	</form>
 
-  <!-- Lägg till en knapp för registrering via GitHub -->
-  <div>
-    <p>Eller</p>
-    <a href="/auth/github" class="github-auth-button">Registrera med GitHub</a>
-  </div>
+	<!-- Knapp för registrering via GitHub -->
+	<div>
+		<p>Eller</p>
+		<a href="/auth/github" class="github-auth-button">Registrera via GitHub</a>
+	</div>
 </main>
 
 <%- include('footer') %>
