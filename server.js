@@ -139,7 +139,7 @@ app.get("/auth/github/callback", async (req, res) => {
 			method: "POST",
 			body: new URLSearchParams({
 				client_id: "169b8ab064c8f1386757", //Klient-ID
-				client_secret: "process.env.GITHUB_CLIENT_SECRET", //Nyckel till projektet i GitHub
+				client_secret: "process.env.SECRET_KEY", //Nyckel till projektet i GitHub
 				code: code,
 			}),
 			headers: {
