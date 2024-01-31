@@ -6,6 +6,8 @@ const session = require("express-session"); //Middleware för sessionshantering 
 const bcrypt = require("bcrypt"); //Krypterar användarnas lösenord genom att hasha dem
 const methodOverride = require("method-override"); //Middleware för PUT och DELETE
 const MongoStore = require("connect-mongo"); //Används för att lagra sessionsdata
+const dotenv = require("dotenv"); //Hämtar information om säkerhetsnycklar etc
+dotenv.config(); //Laddar över miljövariabler från.env till process.env
 
 const app = express(); //Skapar en instans av appen express som använder middleware-funktioner
 //för att behandla förfrågningar via reg och res
@@ -138,8 +140,8 @@ app.get("/auth/github/callback", async (req, res) => {
 		{
 			method: "POST",
 			body: new URLSearchParams({
-				client_id: "169b8ab064c8f1386757", //Klient-ID
-				client_secret: "process.env.SECRET_KEY", //Nyckel till projektet i GitHub
+				client_id: process.env.GITHUB_CLIENT_ID, //Klient-ID
+				client_secret: process.env.GITHUB_CLIENT_SECRET, //Nyckel till projektet i GitHub
 				code: code,
 			}),
 			headers: {
