@@ -136,16 +136,16 @@ app.get("/auth/github/callback", async (req, res) => {
 	const code = req.query.code; //Hämtar kod från GitHub
 	//Anropar GitHub's API för att byta koden mot en access token
 	const response = await fetch(
-		"https://github.com/login/oauth/access_token", //Använder fetch för att göra en POST-förfrågan till GitHub
+		"https://github.com/login/oauth/access_token", // URL för utbyte av GitHub OAuth-token
 		{
 			method: "POST",
 			body: new URLSearchParams({
-				client_id: process.env.GITHUB_CLIENT_ID, //Klient-ID
+				client_id: process.env.GITHUB_CLIENT_ID, //Klient-ID för projektet i GitHub
 				client_secret: process.env.GITHUB_CLIENT_SECRET, //Nyckel till projektet i GitHub
-				code: code,
+				code: code, //Kod som tidigare hämtats från GitHub-inloggning
 			}),
 			headers: {
-				Accept: "application/json",
+				Accept: "application/json", //Svar från GitHub
 			},
 		}
 	);
@@ -158,12 +158,12 @@ app.get("/auth/github/callback", async (req, res) => {
 
 		let user = await User.findOne({ username: githubUser.login }); //Undersöker om användaren redan finns i databasen
 		if (!user) {
-			//Om användaren inte finns i databasen skapas en ny användare
+			//Om användaren ej finns i databasen skapas en ny användare
 			user = new User({ username: githubUser.login, password: "" });
 			await user.save(); //Sparar användaren i databasen
 		}
 
-		req.session.userId = user._id; //Upprättar ett sessions-ID för användaren
+		req.session.userId = user._id; //Skapar (eller uppdaterar) ett sessions-ID för användaren
 		res.redirect("/"); //Omdirigerar användaren till rot-URL
 	} else {
 		// Om GitHub ej returnerat ett åtkomsttoken visas ett felmeddelande.
@@ -174,10 +174,10 @@ app.get("/auth/github/callback", async (req, res) => {
 //Funktion för att hämta användarinfo från GitHub med hjälp av ett access token
 const getUserInfoFromGitHub = async (access_token) => {
 	const response = await fetch(
-		"https://api.github.com/user", //Skickar en GET-request till GitHubs API
+		"https://api.github.com/user", //Skickar en GET-request till GitHubs API för att hämta användarinformation
 		{
 			headers: {
-				Authorization: `Bearer ${access_token}`,
+				Authorization: `Bearer ${access_token}`, //Anger åtkomsttoken i Authorization-headern
 			},
 		}
 	);
